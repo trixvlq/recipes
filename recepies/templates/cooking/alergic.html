@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Recipes{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    {% if recipes %}
+    <h2 class="mb-4">Рецепты без ингредиента {{product}}</h2>
+    <div class="row">
+        {% for recipe in recipes %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ recipe.title }}</h5>
+                    <p class="card-text">{{ recipe.description }}</p>
+                    <a href="{{ recipe.get_absolute_url }}" class="btn btn-primary">View Recipe</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>Нету рецептов без {{ product }}</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+services:
+  recepies_app:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./recepies:/recepies
+    env_file:
+      - .env
+    command:
+      sh -c "python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - recepies_db
+
+  recepies_db:
+    image: postgres:alpine
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}

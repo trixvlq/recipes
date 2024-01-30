@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ recipe.title }}{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <h1>{{ recipe.title }}</h1>
+            <p>{{ recipe.description }}</p>
+
+            <h2>Ингредиенты:</h2>
+            <ul>
+                {% for i in recipe.detailed_ingredients.all %}
+                <li>{{ i.ingredient.title }} - {{ i.amount }} {{ i.units }}
+                    <a href="{% url 'show_recipes_without_product' i.ingredient.id %}">Поиск без
+                        ингредиента</a>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <h2>Инструкция:</h2>
+            <p>{{ recipe.process | linebreaks }}</p>
+
+            <p>Количество использований: {{ recipe.usage }}</p>
+
+            <form method="post" action="{% url 'cook_recipe' recipe.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-dark">Приготовить рецепт</button>
+            </form>
+        </div>
+        <div class="col-lg-4">
+            <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="img-fluid">
+        </div>
+    </div>
+</div>
+{% endblock %}
