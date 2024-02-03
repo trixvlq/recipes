@@ -14,6 +14,7 @@ class Dish(models.Model):
 class Recipe(models.Model):
     title = models.CharField(max_length=255, unique=True, verbose_name='Название рецепта')
     slug = AutoSlugField(unique=True, populate_from='title', verbose_name='Слаг')
+    dish_type = models.ForeignKey('Dish', verbose_name='Вид блюда')
     description = models.TextField(verbose_name='Описание')
     process = models.TextField(verbose_name='Инструкция')
     usage = models.PositiveIntegerField(default=0, verbose_name='Количество использований')
