@@ -10,11 +10,14 @@ class Dish(models.Model):
         verbose_name = 'Блюдо'
         verbose_name_plural = 'Блюда'
 
+    def __str__(self):
+        return self.title
+
 
 class Recipe(models.Model):
     title = models.CharField(max_length=255, unique=True, verbose_name='Название рецепта')
     slug = AutoSlugField(unique=True, populate_from='title', verbose_name='Слаг')
-    dish_type = models.ForeignKey('Dish', verbose_name='Вид блюда')
+    dish_type = models.ForeignKey('Dish', on_delete=models.CASCADE, verbose_name='Вид блюда')
     description = models.TextField(verbose_name='Описание')
     process = models.TextField(verbose_name='Инструкция')
     usage = models.PositiveIntegerField(default=0, verbose_name='Количество использований')
@@ -30,6 +33,21 @@ class Recipe(models.Model):
 
     def get_absolute_url(self):
         return reverse('recipe', kwargs={'slug': self.slug})
+
+
+class RecipeStep(models.Model):
+    number = models.PositiveIntegerField(default=1, verbose_name='Номер шага')
+    title = models.CharField(max_length=255, verbose_name='Название шага')
+    description = models.TextField(verbose_name='Описание шага', null=True)
+    image = models.ImageField(upload_to='static/images/%Y/%m/%d/')
+    recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE, verbose_name='Рецепт')
+
+    class Meta:
+        verbose_name = 'Шаг готовки'
+        verbose_name_plural = 'Шаги готовки'
+
+    def __str__(self):
+        return f'{self.number} step to {self.recipe}'
 
 
 class RecipeIngredient(models.Model):

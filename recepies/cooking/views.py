@@ -16,7 +16,7 @@ def get_type(units: str):
 
 
 def index(request):
-    recepies = Recipe.objects.all()
+    recepies = Recipe.objects.all().select_related('dish_type')
     context = {'recipes': recepies}
     return render(request, 'cooking/index.html', context)
 
