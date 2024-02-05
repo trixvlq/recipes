@@ -101,3 +101,10 @@ class RequestIngredient(models.Model):
     halal = models.BooleanField(verbose_name='Халяль')
     is_active = models.BooleanField(default=True)
     accepted = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'Заявка в ингредиенты'
+        verbose_name_plural = 'Заявки в ингредиенты'
+
+    def __str__(self):
+        return f'{self.user.username} suggests {self.title}'
