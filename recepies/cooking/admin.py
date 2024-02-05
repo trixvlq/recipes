@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Recipe, RecipeIngredient, Ingredient
+from .models import *
 from autoslug import AutoSlugField
 
 
@@ -7,13 +7,19 @@ class RecipeIngredientInLine(admin.TabularInline):
     model = RecipeIngredient
 
 
+class RecipeStepInLine(admin.TabularInline):
+    model = RecipeStep
+
+
 class RecipeAdmin(admin.ModelAdmin):
-    inlines = [RecipeIngredientInLine, ]
-    list_display = ('title', 'description', 'process', 'image')
+    inlines = [RecipeIngredientInLine, RecipeStepInLine]
+    list_display = ('title', 'description', 'image')
     search_fields = ['title']
-    exclude = ('rating', 'usage')
+    exclude = ('usage', )
 
 
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(RecipeIngredient)
 admin.site.register(Ingredient)
+admin.site.register(Dish)
+admin.site.register(RecipeStep)

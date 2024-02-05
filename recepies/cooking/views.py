@@ -48,7 +48,7 @@ def cook_recipe(request, recipe_id):
     receipt = get_object_or_404(Recipe, id=recipe_id)
     receipt.usage += 1
     receipt.save()
-    return redirect('receipt', slug=receipt.slug)
+    return redirect('recipe', slug=receipt.slug)
 
 
 def show_recipes_without_product(request, product_id):

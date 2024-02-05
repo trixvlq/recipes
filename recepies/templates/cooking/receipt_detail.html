@@ -21,10 +21,14 @@
                 {% endfor %}
             </ul>
 
-            <h2>Инструкция:</h2>
-            <p>{{ recipe.process | linebreaks }}</p>
-
-            <p>Количество использований: {{ recipe.usage }}</p>
+            <h2>Шаги приготовления:</h2>
+            {% for step in recipe.recipe_steps.all %}
+            <div class="mb-4">
+                <h3>Шаг {{ step.number }}: {{ step.title }}</h3>
+                <p>{{ step.description }}</p>
+                <img src="{{ step.image.url }}" alt="{{ step.title }}" class="img-fluid">
+            </div>
+            {% endfor %}
 
             <form method="post" action="{% url 'cook_recipe' recipe.id %}">
                 {% csrf_token %}
@@ -34,6 +38,7 @@
         <div class="col-lg-4">
             <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="img-fluid">
         </div>
+        <p>Количество использований: {{ recipe.usage }}</p>
     </div>
 </div>
 {% endblock %}

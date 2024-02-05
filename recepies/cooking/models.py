@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 from autoslug import AutoSlugField
@@ -19,7 +20,6 @@ class Recipe(models.Model):
     slug = AutoSlugField(unique=True, populate_from='title', verbose_name='Слаг')
     dish_type = models.ForeignKey('Dish', on_delete=models.CASCADE, verbose_name='Вид блюда')
     description = models.TextField(verbose_name='Описание')
-    process = models.TextField(verbose_name='Инструкция')
     usage = models.PositiveIntegerField(default=0, verbose_name='Количество использований')
     ingredients = models.ManyToManyField('Ingredient', verbose_name='Ингредиенты', through='RecipeIngredient')
     image = models.ImageField(upload_to='static/images/%Y/%m/%d/', verbose_name='Картинка рецепта')
@@ -40,14 +40,14 @@ class RecipeStep(models.Model):
     title = models.CharField(max_length=255, verbose_name='Название шага')
     description = models.TextField(verbose_name='Описание шага', null=True)
     image = models.ImageField(upload_to='static/images/%Y/%m/%d/')
-    recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE, verbose_name='Рецепт')
+    recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE, verbose_name='Рецепт', related_name='recipe_steps')
 
     class Meta:
         verbose_name = 'Шаг готовки'
         verbose_name_plural = 'Шаги готовки'
 
     def __str__(self):
-        return f'{self.number} step to {self.recipe}'
+        return f'{self.number} step to {self.recipe.title}'
 
 
 class RecipeIngredient(models.Model):
@@ -73,7 +73,13 @@ class RecipeIngredient(models.Model):
 
 class Ingredient(models.Model):
     title = models.CharField(max_length=255, verbose_name='Имя ингредиента')
+    description = models.TextField(verbose_name='Описание продукта')
     image = models.ImageField(upload_to='static/images/%Y/%m/%d/', verbose_name='Картинка ингредиента')
+    carbs = models.FloatField(default=1, verbose_name='Углеводы')
+    fats = models.FloatField(default=1, verbose_name='Жиры')
+    protein = models.FloatField(default=1, verbose_name='Белки')
+    vegan = models.BooleanField(verbose_name='Вегетарианская')
+    halal = models.BooleanField(verbose_name='Халяль')
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -81,3 +87,17 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class RequestIngredient(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Создатель')
+    title = models.CharField(max_length=255, verbose_name='Имя ингредиента')
+    description = models.TextField(verbose_name='Описание продукта')
+    image = models.ImageField(upload_to='static/images/%Y/%m/%d/', verbose_name='Картинка ингредиента')
+    carbs = models.FloatField(default=1, verbose_name='Углеводы')
+    fats = models.FloatField(default=1, verbose_name='Жиры')
+    protein = models.FloatField(default=1, verbose_name='Белки')
+    vegan = models.BooleanField(verbose_name='Вегетарианская')
+    halal = models.BooleanField(verbose_name='Халяль')
+    is_active = models.BooleanField(default=True)
+    accepted = models.BooleanField(default=False)
