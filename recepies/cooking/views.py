@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.db.models import Prefetch, Q
+
+from .forms import SuggestionForm
 from .models import *
 
 
@@ -49,6 +51,73 @@ def cook_recipe(request, recipe_id):
     receipt.usage += 1
     receipt.save()
     return redirect('recipe', slug=receipt.slug)
+
+
+def suggest_ingredient(request):
+    if request.method == 'POST':
+        form = SuggestionForm(request.POST, request.FILES)
+        if form.is_valid():
+            ingredient = form.save(commit=False)
+            ingredient.user = request.user
+            ingredient.save()
+            return redirect('home')
+    else:
+        form = SuggestionForm()
+        return render(request, 'Cooking/suggest.html', {'title': 'Создать мороженное', 'form': form})
+
+
+def suggested_ingredients(request):
+    suggestions = RequestIngredient.objects.all()
+    context = {
+        'suggestions': suggestions
+    }
+    return render(request, 'cooking/suggestions.html', context)
+
+
+def edit_suggestion(request, request_id):
+    suggestion_instance = RequestIngredient.objects.get(id=request_id)
+    form = SuggestionForm(instance=suggestion_instance)
+    if request.method == "POST":
+        form = SuggestionForm(request.POST, request.FILES, instance=suggestion_instance)
+        if form.is_valid():
+            suggest = form.save(commit=False)
+            if form.has_changed():
+                suggest.edited = True
+            suggest.save()
+            return redirect('home')
+    else:
+        form = SuggestionForm(instance=suggestion_instance)  # Вернуть исходную форму для редактирования
+    return render(request, 'cooking/suggest.html', {'form': form})
+
+
+
+def approve_request(request, request_id):
+    ingredient_request = get_object_or_404(RequestIngredient, id=request_id)
+    ingredient_request.accepted = True
+    ingredient, created = Ingredient.objects.get_or_create(title=ingredient_request.title,
+                                                           description=ingredient_request.description,
+                                                           image=ingredient_request.image,
+                                                           carbs=ingredient_request.carbs,
+                                                           fats=ingredient_request.fats,
+                                                           protein=ingredient_request.protein,
+                                                           vegan=ingredient_request.vegan,
+                                                           halal=ingredient_request.halal)
+    ingredient_request.save()
+    return redirect('suggestions')
+
+
+def suggestion(request, request_id):
+    suggestion = RequestIngredient.objects.get(id=request_id)
+    context = {
+        'suggestion': suggestion
+    }
+    return render(request, 'cooking/suggestion.html', context)
+
+
+def reject_request(request, request_id):
+    ingredient_request = get_object_or_404(RequestIngredient, id=request_id)
+    ingredient_request.delete()
+    return redirect('view_requests')
 
 
 def show_recipes_without_product(request, product_id):

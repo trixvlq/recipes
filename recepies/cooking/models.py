@@ -27,6 +27,9 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        indexes = [
+            models.Index(fields=["title"])
+        ]
 
     def __str__(self):
         return self.title
@@ -72,7 +75,7 @@ class RecipeIngredient(models.Model):
 
 
 class Ingredient(models.Model):
-    title = models.CharField(max_length=255, verbose_name='Имя ингредиента')
+    title = models.CharField(max_length=255, verbose_name='Имя ингредиента', unique=True)
     description = models.TextField(verbose_name='Описание продукта')
     image = models.ImageField(upload_to='static/images/%Y/%m/%d/', verbose_name='Картинка ингредиента')
     carbs = models.FloatField(default=1, verbose_name='Углеводы')
@@ -97,10 +100,12 @@ class RequestIngredient(models.Model):
     carbs = models.FloatField(default=1, verbose_name='Углеводы')
     fats = models.FloatField(default=1, verbose_name='Жиры')
     protein = models.FloatField(default=1, verbose_name='Белки')
+    calories = models.FloatField(default=1, verbose_name='Калорийность')
     vegan = models.BooleanField(verbose_name='Вегетарианская')
     halal = models.BooleanField(verbose_name='Халяль')
     is_active = models.BooleanField(default=True)
     accepted = models.BooleanField(default=False)
+    edited = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Заявка в ингредиенты'

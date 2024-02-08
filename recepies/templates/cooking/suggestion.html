@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Ingredient Request - {{ request_suggestion.title }}{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1>Ingredient Request - {{ suggestion.title }}</h1>
+    <p><strong>Description:</strong> {{ suggestion.description }}</p>
+    <p><strong>Creator:</strong> {{ suggestion.user.username }}</p>
+    <p><strong>Carbs:</strong> {{ suggestion.carbs }}</p>
+    <p><strong>Fats:</strong> {{ suggestion.fats }}</p>
+    <p><strong>Protein:</strong> {{ suggestion.protein }}</p>
+    <p><strong>Calories:</strong> {{ suggestion.calories }}</p>
+    <p><strong>Vegan:</strong> {% if suggestion.vegan %}Yes{% else %}No{% endif %}</p>
+    <p><strong>Halal:</strong> {% if suggestion.halal %}Yes{% else %}No{% endif %}</p>
+    <img src="{{ suggestion.image.url }}" alt="{{ suggestion.title }}" class="img-fluid">
+    <br>
+    <a href="{% url 'suggestions' %}">Back to Requests</a>
+    <a href="{% url 'edit_request' suggestion.id%}">Edit</a>
+    <a href="{% url 'suggestions' %}">Approve</a>
+    <a href="{% url 'suggestions' %}">Reject</a>
+</div>
+{% endblock %}

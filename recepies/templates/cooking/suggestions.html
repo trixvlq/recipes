@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Ingredient Requests{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1>Ingredient Requests</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Creator</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in suggestions %}
+            <tr>
+                <td><a href = "{% url 'suggestion' request.id %}">{{ request.title }}</a></td>
+                <td>{{ request.description }}</td>
+                <td>{{ request.user.username }}</td>
+                <td>
+                    <a href="{% url 'approve_request' request.id %}">Approve</a>
+                    <a href="{% url 'reject_request' request.id %}">Reject</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

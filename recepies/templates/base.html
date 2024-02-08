@@ -22,6 +22,10 @@
                 <li><a href="{% url 'home' %}" class="nav-link px-2 text-white">Salads</a></li>
                 <li><a href="{% url 'home' %}" class="nav-link px-2 text-white">Bakery</a></li>
                 <li><a href="{% url 'home' %}" class="nav-link px-2 text-white">Fried</a></li>
+                <li><a href="{% url 'suggest' %}" class="nav-link px-2 text-white">Suggest an ingredient</a></li>
+                {% if user.is_superuser %}
+                <li><a href="{% url 'suggestions' %}" class="nav-link px-2 text-white">Suggestions</a></li>
+                {% endif %}
             </ul>
 
         </div>
