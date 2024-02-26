@@ -1,4 +1,4 @@
-from django.forms import ModelForm, formset_factory
+from django.forms import ModelForm
 
 from cooking.models import Recipe, RecipeIngredient
 from .models import UserRecipeReview
@@ -19,6 +19,3 @@ class RecipeIngredientForm(ModelForm):
     class Meta:
         model = RecipeIngredient
         fields = ['ingredient', 'units', 'amount']
-
-
-IngredientFormSet = formset_factory(RecipeIngredientForm, extra=2)

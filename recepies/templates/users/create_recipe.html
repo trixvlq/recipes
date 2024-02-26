@@ -6,58 +6,55 @@
 {% endblock %}
 {% block content %}
 <div class="container">
-  <h1>Создание рецепта</h1>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="form-group">
-      <label for="id_title">Название рецепта:</label>
-      {{ recipe_form.title }}
-    </div>
-    <div class="form-group">
-      <label for="id_dish_type">Вид блюда:</label>
-      {{ recipe_form.dish_type }}
-    </div>
-    <div class="form-group">
-      <label for="id_description">Описание:</label>
-      {{ recipe_form.description }}
-    </div>
-    <div class="form-group">
-      <label for="id_image">Картинка рецепта:</label>
-      {{ recipe_form.image }}
-    </div>
-    <div class="form-group">
-      <label for="id_halal">Халяль:</label>
-      {{ recipe_form.halal }}
-    </div>
-    <div class="form-group">
-      <label for="id_vegan">Вегетарианское:</label>
-      {{ recipe_form.vegan }}
-    </div>
-    <div id="ingredient-forms">
-      <fieldset>
-        <legend>Ингредиенты:</legend>
-        {{ ingredient_formset.management_form }}
-        {% for form in ingredient_formset %}
-          <div class="ingredient-form">
-            {{ form.as_p }}
-          </div>
-        {% endfor %}
-      </fieldset>
-      <button type="button" id="add_ingredient">Добавить ингредиент</button>
-    </div>
-    <button type="submit" class="btn btn-primary">Сохранить рецепт</button>
-  </form>
+    <h1>Создание рецепта</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_title">Название рецепта:</label>
+            {{ recipe_form.title }}
+        </div>
+        <div class="form-group">
+            <label for="id_dish_type">Вид блюда:</label>
+            {{ recipe_form.dish_type }}
+        </div>
+        <div class="form-group">
+            <label for="id_description">Описание:</label>
+            {{ recipe_form.description }}
+        </div>
+        <div class="form-group">
+            <label for="id_image">Картинка рецепта:</label>
+            {{ recipe_form.image }}
+        </div>
+        <div class="form-group">
+            <label for="id_halal">Халяль:</label>
+            {{ recipe_form.halal }}
+        </div>
+        <div class="form-group">
+            <label for="id_vegan">Вегетарианское:</label>
+            {{ recipe_form.vegan }}
+        </div>
+        <div id="ingredient-forms">
+            <fieldset>
+                <legend>Ингредиенты:</legend>
+                {{ ingredient_formset.management_form }}
+                {% for form in ingredient_formset %}
+                <div class="ingredient-form">
+                    {{ form.as_p }}
+                </div>
+                {% endfor %}
+            </fieldset>
+            {% if extra > 1 %}
+                <a class="btn" href="{% url 'create_recipe_extra' extra|add:1 %}">Добавить ингредиент</a>
+                <a class="btn" href="{% url 'create_recipe_extra' extra|add:'-1' %}">Убрать ингредиент</a>
+            {% else %}
+                <a class="btn" href="{% url 'create_recipe_extra' 2 %}">Добавить ингредиент</a>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить рецепт</button>
+    </form>
 </div>
 
-<script>
-  document.getElementById('add_ingredient').addEventListener('click', function() {
-    var ingredientForms = document.querySelectorAll('.ingredient-form');
-    for (var i = 0; i < ingredientForms.length; i++) {
-      if (!ingredientForms[i].classList.contains('active')) {
-        ingredientForms[i].classList.add('active');
-        break;
-      }
-    }
-  });
-</script>
+{% for i in formset.empty_form %}
+{{ i }}
+{% endfor %}
 {% endblock %}

@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.forms import formset_factory
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
-from cooking.models import Recipe
-from users.forms import RecipeReviewForm, CreateRecipe, IngredientFormSet
+from cooking.models import Recipe, RecipeIngredient
+from users.forms import RecipeReviewForm, CreateRecipe, RecipeIngredientForm
 from users.models import UserRecipeReview
 
 
@@ -50,7 +51,8 @@ def review(request, slug):
 
 
 @login_required
-def create_page(request):
+def create_page(request, extra=1):
+    IngredientFormSet = formset_factory(RecipeIngredientForm, extra=extra)
     if request.method == "POST":
         recipe_form = CreateRecipe(request.POST, request.FILES)
         ingredient_formset = IngredientFormSet(request.POST)
@@ -58,15 +60,21 @@ def create_page(request):
             recipe = recipe_form.save(commit=False)
             recipe.user = request.user
             recipe.save()
-            ingredient_formset.save()
+            for ingredient in ingredient_formset:
+                ingredient_recipe = ingredient.cleaned_data['ingredient']
+                units = ingredient.cleaned_data['units']
+                amount = ingredient.cleaned_data['amount']
+                if not RecipeIngredient.objects.filter(recipe=recipe, ingredient=ingredient_recipe).exists():
+                    RecipeIngredient.objects.create(recipe=recipe, ingredient=ingredient_recipe, units=units,
+                                                    amount=amount)
+                else:
+                    messages.add_message(request, messages.INFO,
+                                         f"Ingredient {ingredient_recipe} is already in {recipe}")
             return redirect('home')
         else:
-            for form in ingredient_formset:
-                for field in form:
-                    for error in field.errors:
-                        messages.error(request, error)
             return redirect('home')
     else:
         recipe_form = CreateRecipe()
         ingredient_formset = IngredientFormSet()
-    return render(request, 'users/create_recipe.html', {'recipe_form': recipe_form, 'ingredient_formset': ingredient_formset})
+    return render(request, 'users/create_recipe.html',
+                  {'recipe_form': recipe_form, 'ingredient_formset': ingredient_formset, 'extra': extra})

@@ -7,4 +7,5 @@ urlpatterns = [
     path('recipes/', list_recipies, name='users_recipes'),
     path('submit_review/<slug:slug>/', review, name='submit_review'),
     path('create_recipe/', create_page, name='create_recipe'),
+    path('create_recipe/<int:extra>/', create_page, name='create_recipe_extra'),
 ]
