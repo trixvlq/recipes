@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.db.models import Prefetch, Q
 
+from users.forms import *
+from users.models import UserRecipeReview
 from .forms import SuggestionForm
 from .models import *
 
@@ -18,17 +20,33 @@ def get_type(units: str):
 
 
 def index(request):
-    recepies = Recipe.objects.all().select_related('dish_type')
-    context = {'recipes': recepies}
+    recipes = Recipe.objects.select_related('dish_type')
+    context = {
+        'user': request.user,
+        'recipes': recipes,
+        'page_name': 'Все рецепты'
+    }
     return render(request, 'cooking/index.html', context)
 
 
 def get_recipe(request, slug):
-    receipt = get_object_or_404(Recipe.objects.prefetch_related(
-        Prefetch('detailed_ingredients', queryset=RecipeIngredient.objects.select_related('ingredient').all())),
-        slug=slug)
-    context = {'recipe': receipt}
-    return render(request, 'cooking/receipt_detail.html', context)
+    receipt = get_object_or_404(
+        Recipe.objects.prefetch_related(
+            Prefetch('detailed_ingredients',
+                     queryset=RecipeIngredient.objects.select_related('ingredient')
+                     ),
+            Prefetch('reviews', queryset=UserRecipeReview.objects.all())
+            ,
+        ),
+        slug=slug
+    )
+    form = RecipeReviewForm()
+    context = {
+        'recipe': receipt,
+        'form': form,
+    }
+
+    return render(request, 'cooking/recipe_detailed.html', context)
 
 
 def add_product_to_recipe(request, recipe_id, product_id, weight, units):
@@ -90,10 +108,10 @@ def edit_suggestion(request, request_id):
     return render(request, 'cooking/suggest.html', {'form': form})
 
 
-
 def approve_request(request, request_id):
     ingredient_request = get_object_or_404(RequestIngredient, id=request_id)
     ingredient_request.accepted = True
+    ingredient_request.is_active = False
     ingredient, created = Ingredient.objects.get_or_create(title=ingredient_request.title,
                                                            description=ingredient_request.description,
                                                            image=ingredient_request.image,
@@ -116,7 +134,9 @@ def suggestion(request, request_id):
 
 def reject_request(request, request_id):
     ingredient_request = get_object_or_404(RequestIngredient, id=request_id)
-    ingredient_request.delete()
+    ingredient_request.is_active = False
+    ingredient_request.accepted = False
+    ingredient_request.save()
     return redirect('view_requests')
 
 

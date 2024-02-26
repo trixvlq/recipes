@@ -1,7 +1,8 @@
-from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 from autoslug import AutoSlugField
+from django.conf import settings
+from django.contrib.auth.models import User
 
 
 class Dish(models.Model):
@@ -16,13 +17,16 @@ class Dish(models.Model):
 
 
 class Recipe(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Создатель')
     title = models.CharField(max_length=255, unique=True, verbose_name='Название рецепта')
     slug = AutoSlugField(unique=True, populate_from='title', verbose_name='Слаг')
     dish_type = models.ForeignKey('Dish', on_delete=models.CASCADE, verbose_name='Вид блюда')
     description = models.TextField(verbose_name='Описание')
     usage = models.PositiveIntegerField(default=0, verbose_name='Количество использований')
-    ingredients = models.ManyToManyField('Ingredient', verbose_name='Ингредиенты', through='RecipeIngredient')
+    ingredients = models.ManyToManyField('Ingredient', verbose_name='Ингредиенты', through='RecipeIngredient',related_name='ingredient_in_recipe')
     image = models.ImageField(upload_to='static/images/%Y/%m/%d/', verbose_name='Картинка рецепта')
+    halal = models.BooleanField(default=True, verbose_name='Халяль')
+    vegan = models.BooleanField(default=True, verbose_name='Вегатарианское')
 
     class Meta:
         verbose_name = 'Рецепт'
@@ -36,6 +40,18 @@ class Recipe(models.Model):
 
     def get_absolute_url(self):
         return reverse('recipe', kwargs={'slug': self.slug})
+
+    def check_vegan(self, *args, **kwargs):
+        if self.ingredients.filter(vegan=False).exists():
+            self.vegan = False
+        else:
+            self.vegan = True
+
+    def check_halal(self, *args, **kwargs):
+        if self.ingredients.filter(halal=False).exists():
+            self.halal = False
+        else:
+            self.halal = True
 
 
 class RecipeStep(models.Model):
@@ -62,7 +78,7 @@ class RecipeIngredient(models.Model):
     )
     recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE, verbose_name='Рецепт',
                                related_name='detailed_ingredients')
-    ingredient = models.ForeignKey('Ingredient', on_delete=models.CASCADE, verbose_name='Ингредиент')
+    ingredient = models.ForeignKey('Ingredient', on_delete=models.CASCADE, verbose_name='Ингредиент',related_name='ingredient_on_recipe')
     units = models.CharField(max_length=255, choices=UNITS, verbose_name='Единицы измерения')
     amount = models.IntegerField(default=0, verbose_name='Количество')
 
@@ -75,12 +91,14 @@ class RecipeIngredient(models.Model):
 
 
 class Ingredient(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Создатель')
     title = models.CharField(max_length=255, verbose_name='Имя ингредиента', unique=True)
     description = models.TextField(verbose_name='Описание продукта')
     image = models.ImageField(upload_to='static/images/%Y/%m/%d/', verbose_name='Картинка ингредиента')
     carbs = models.FloatField(default=1, verbose_name='Углеводы')
     fats = models.FloatField(default=1, verbose_name='Жиры')
     protein = models.FloatField(default=1, verbose_name='Белки')
+    calories = models.FloatField(default=1, verbose_name='Калорийность')
     vegan = models.BooleanField(verbose_name='Вегетарианская')
     halal = models.BooleanField(verbose_name='Халяль')
 
@@ -92,17 +110,7 @@ class Ingredient(models.Model):
         return self.title
 
 
-class RequestIngredient(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Создатель')
-    title = models.CharField(max_length=255, verbose_name='Имя ингредиента')
-    description = models.TextField(verbose_name='Описание продукта')
-    image = models.ImageField(upload_to='static/images/%Y/%m/%d/', verbose_name='Картинка ингредиента')
-    carbs = models.FloatField(default=1, verbose_name='Углеводы')
-    fats = models.FloatField(default=1, verbose_name='Жиры')
-    protein = models.FloatField(default=1, verbose_name='Белки')
-    calories = models.FloatField(default=1, verbose_name='Калорийность')
-    vegan = models.BooleanField(verbose_name='Вегетарианская')
-    halal = models.BooleanField(verbose_name='Халяль')
+class RequestIngredient(Ingredient):
     is_active = models.BooleanField(default=True)
     accepted = models.BooleanField(default=False)
     edited = models.BooleanField(default=False)

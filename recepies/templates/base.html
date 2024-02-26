@@ -26,6 +26,9 @@
                 {% if user.is_superuser %}
                 <li><a href="{% url 'suggestions' %}" class="nav-link px-2 text-white">Suggestions</a></li>
                 {% endif %}
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'cabinet' %}" class="nav-link px-2 text-white">Profile</a></li>
+                {% endif %}
             </ul>
 
         </div>

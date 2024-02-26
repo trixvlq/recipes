@@ -37,8 +37,50 @@
         </div>
         <div class="col-lg-4">
             <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="img-fluid">
+            <p>Количество использований: {{ recipe.usage }}</p>
         </div>
-        <p>Количество использований: {{ recipe.usage }}</p>
     </div>
+</div>
+
+<div class="container mt-5">
+    <h2>Отзывы:</h2>
+    {% for review in recipe.reviews.all %}
+    <div class="card">
+        <div class="card-body">
+            <p class="card-text"><strong>{{ review.user }}</strong> - {{ review.rating }}/5</p>
+            <p class="card-text">{{ review.content }}</p>
+        </div>
+
+    </div>
+    {% empty %}
+    <p>Пока нет отзывов.</p>
+    {% endfor %}
+    <div class="container mt-5">
+        <h3>Оставить отзыв</h3>
+        <form method="post" action="{% url 'submit_review' recipe.slug %}">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="form-group">
+                {{ form.rating.label_tag }}
+                {{ form.rating }}
+                {% if form.rating.errors %}
+                <div class="invalid-feedback">
+                    {{ form.rating.errors }}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.content.label_tag }}
+                {{ form.content }}
+                {% if form.content.errors %}
+                <div class="invalid-feedback">
+                    {{ form.content.errors }}
+                </div>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </form>
+    </div>
+
 </div>
 {% endblock %}

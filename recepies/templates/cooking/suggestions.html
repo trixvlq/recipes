@@ -9,25 +9,36 @@
     <h1>Ingredient Requests</h1>
     <table class="table">
         <thead>
-            <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Creator</th>
-                <th>Actions</th>
-            </tr>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Creator</th>
+            <th>Actions</th>
+        </tr>
         </thead>
         <tbody>
-            {% for request in suggestions %}
-            <tr>
-                <td><a href = "{% url 'suggestion' request.id %}">{{ request.title }}</a></td>
-                <td>{{ request.description }}</td>
-                <td>{{ request.user.username }}</td>
-                <td>
-                    <a href="{% url 'approve_request' request.id %}">Approve</a>
-                    <a href="{% url 'reject_request' request.id %}">Reject</a>
-                </td>
-            </tr>
-            {% endfor %}
+        {% for request in suggestions %}
+        <tr>
+            <td><a href="{% url 'suggestion' request.id %}">{{ request.title }}</a></td>
+            <td>{{ request.description }}</td>
+            <td>{{ request.user.username }}</td>
+            {% if request.is_active %}
+            <td>
+                <a href="{% url 'approve_request' request.id %}">Approve</a>
+                <a href="{% url 'reject_request' request.id %}">Reject</a>
+            </td>
+            {% endif %}
+            {% if not request.is_active%}
+            <td>
+            {% if request.accepted %}
+                <h6>Accepted</h6>
+            {% else %}
+                <h6>Rejected</h6>
+            {% endif %}
+            </td>
+            {% endif%}
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>

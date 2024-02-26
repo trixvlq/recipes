@@ -1,3 +1,12 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+
+class IngredientRecordsInLine(admin.TabularInline):
+    model = IngredientRecords
+
+
+
+admin.site.register(IngredientRecords)
+admin.site.register(UserIngredientReview)
+admin.site.register(UserRecipeReview)
