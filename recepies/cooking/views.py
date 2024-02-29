@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.db.models import Prefetch, Q
@@ -70,7 +71,7 @@ def cook_recipe(request, recipe_id):
     receipt.save()
     return redirect('recipe', slug=receipt.slug)
 
-
+@login_required
 def suggest_ingredient(request):
     if request.method == 'POST':
         form = SuggestionForm(request.POST, request.FILES)
@@ -104,7 +105,7 @@ def edit_suggestion(request, request_id):
             suggest.save()
             return redirect('home')
     else:
-        form = SuggestionForm(instance=suggestion_instance)  # Вернуть исходную форму для редактирования
+        form = SuggestionForm(instance=suggestion_instance)
     return render(request, 'cooking/suggest.html', {'form': form})
 
 

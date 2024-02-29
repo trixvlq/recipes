@@ -18,16 +18,17 @@
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                 <li><a href="{% url 'home' %}" class="nav-link px-2 text-white">Home</a></li>
-                <li><a href="{% url 'home' %}" class="nav-link px-2 text-white">Soups</a></li>
-                <li><a href="{% url 'home' %}" class="nav-link px-2 text-white">Salads</a></li>
-                <li><a href="{% url 'home' %}" class="nav-link px-2 text-white">Bakery</a></li>
-                <li><a href="{% url 'home' %}" class="nav-link px-2 text-white">Fried</a></li>
-                <li><a href="{% url 'suggest' %}" class="nav-link px-2 text-white">Suggest an ingredient</a></li>
                 {% if user.is_superuser %}
                 <li><a href="{% url 'suggestions' %}" class="nav-link px-2 text-white">Suggestions</a></li>
                 {% endif %}
                 {% if user.is_authenticated %}
+                <li><a href="{% url 'suggest' %}" class="nav-link px-2 text-white">Suggest an ingredient</a></li>
+                <li><a href="{% url 'create_recipe' %}" class="nav-link px-2 text-white">Suggest a recipe</a></li>
                 <li><a href="{% url 'cabinet' %}" class="nav-link px-2 text-white">Profile</a></li>
+                <li><a href="{% url 'logout' %}" class="nav-link px-2 text-white">Logout</a></li>
+                {% else %}
+                <li><a href="{% url 'login' %}" class="nav-link px-2 text-white">Login</a></li>
+                <li><a href="{% url 'registration' %}" class="nav-link px-2 text-white">Register</a></li>
                 {% endif %}
             </ul>
 

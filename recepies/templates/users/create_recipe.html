@@ -43,11 +43,21 @@
                 </div>
                 {% endfor %}
             </fieldset>
-            {% if extra > 1 %}
-                <a class="btn" href="{% url 'create_recipe_extra' extra|add:1 %}">Добавить ингредиент</a>
-                <a class="btn" href="{% url 'create_recipe_extra' extra|add:'-1' %}">Убрать ингредиент</a>
-            {% else %}
-                <a class="btn" href="{% url 'create_recipe_extra' 2 %}">Добавить ингредиент</a>
+            <fieldset>
+                <legend>Шаги готовки:</legend>
+                {{ steps_formset.management_form }}
+                {% for form in steps_formset %}
+                <div class="ingredient-form">
+                    {{ form.as_p }}
+                </div>
+                {% endfor %}
+            </fieldset>
+            <a class="btn" href="{% url 'create_recipe_extra' extra_ing|add:1 extra_steps %}">Добавить ингредиент</a>
+            <a class="btn" href="{% url 'create_recipe_extra' extra_ing extra_steps|add:1 %}">Добавить шаг</a>
+            {% if extra_ing > 1 %}
+            <a class="btn" href="{% url 'create_recipe_extra' extra_ing|add:'-1' extra_steps %}">Убрать ингредиент</a>
+            {% elif extra_steps > 1%}
+            <a class="btn" href="{% url 'create_recipe_extra' extra_ing extra_steps|add:'-1' %}">Убрать шаг</a>
             {% endif %}
         </div>
         <button type="submit" class="btn btn-primary">Сохранить рецепт</button>
